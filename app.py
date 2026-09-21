@@ -2,6 +2,7 @@ import os
 import streamlit as st
 
 from src.pdf_processor import extract_text_from_pdf, clean_text
+from src.chunker import create_chunks
 
 st.set_page_config(
     page_title="LearnQuest AI",
@@ -47,6 +48,14 @@ if uploaded_file is not None:
             text[:5000],
             height=400
         )
+        st.subheader("Document Chunks")
 
+        chunks = create_chunks(text)
+
+        st.write(f"Total chunks: {len(chunks)}")
+
+        for index, chunk in enumerate(chunks[:5], start=1):
+            with st.expander(f"Chunk {index}"):
+                st.write(chunk)
     except Exception as error:
         st.error(f"Error processing PDF: {error}")
