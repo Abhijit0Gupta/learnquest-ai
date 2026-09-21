@@ -1,8 +1,7 @@
 import os
 import streamlit as st
 
-from src.pdf_processor import extract_text_from_pdf
-
+from src.pdf_processor import extract_text_from_pdf, clean_text
 
 st.set_page_config(
     page_title="LearnQuest AI",
@@ -31,7 +30,8 @@ if uploaded_file is not None:
         file.write(uploaded_file.getbuffer())
 
     try:
-        text = extract_text_from_pdf(pdf_path)
+        raw_text = extract_text_from_pdf(pdf_path)
+        text = clean_text(raw_text)
 
         st.success("PDF processed successfully!")
 
