@@ -5,6 +5,7 @@ import streamlit as st
 from src.pdf_processor import extract_text_from_pdf, clean_text
 from src.chunker import create_chunks
 from src.retriever import DocumentRetriever
+from src.qa import answer_question
 
 
 st.set_page_config(
@@ -64,24 +65,34 @@ if uploaded_file is not None:
 
         retriever = DocumentRetriever(chunks)
 
-        st.subheader("Test Document Retrieval")
+        st.subheader("Ask LearnQuest AI")
 
         question = st.text_input(
-            "Ask a question about your document"
+            "Ask a question about your uploaded document"
         )
 
         if question:
-            results = retriever.search(
-                question,
-                top_k=3
-            )
+            with st.spinner("Analyzing your document..."):
 
-            st.write("Most relevant sections:")
+                answer, results = answer_question(
+                    retriever,
+                    question,
+                    top_k=2
+                )
 
-            for index, (chunk, score) in enumerate(results, start=1):
-                with st.expander(
-                    f"Result {index} — Similarity: {score:.3f}"
+            st.markdown("### 🤖 Answer")
+
+            st.write(answer)
+
+            with st.expander("View supporting document sections"):
+
+                for index, (chunk, score) in enumerate(
+                    results,
+                    start=1
                 ):
+                    st.markdown(
+                        f"**Section {index} — Similarity: {score:.3f}**"
+                    )
                     st.write(chunk)
 
     except Exception as error:
